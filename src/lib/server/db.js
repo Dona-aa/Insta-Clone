@@ -1,5 +1,11 @@
 import mysql from 'mysql2/promise';
-import { DB_NAME, DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } from '$env/static/private';
+import {
+	DB_NAME,
+	DB_HOST,
+	DB_USER,
+	DB_PASSWORD,
+	DB_PORT
+} from '$env/static/private';
 
 const pool = mysql.createPool({
 	host: DB_HOST,

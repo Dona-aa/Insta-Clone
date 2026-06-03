@@ -1,30 +1,27 @@
-import { db } from '$lib/server/db';
+import pool from '$lib/server/db';
 import bcrypt from 'bcrypt';
-import { redirect, fail } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
 export const actions = {
-  default: async ({ request }) => {
-    const data = await request.formData();
+    default: async ({ request }) => {
 
-    const name = data.get('name');
-    const email = data.get('email');
-    const password = data.get('password');
+        const data = await request.formData();
 
-    if (!name || !email || !password) {
-      return fail(400, { error: 'Please fill in all fields.' });
+        const username = data.get('name');
+        const email = data.get('email');
+        const password = data.get('password');
+
+        const password_hash = await bcrypt.hash(password, 10);
+
+        await pool.query(
+            `
+            INSERT INTO users
+            (username, email, password_hash)
+            VALUES (?, ?, ?)
+            `,
+            [username, email, password_hash]
+        );
+
+        throw redirect(303, '/login');
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    try {
-      await db.query(
-        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-        [name, email, hashedPassword]
-      );
-    } catch (error) {
-      return fail(400, { error: 'Email already exists.' });
-    }
-
-    throw redirect(303, '/login');
-  }
 };
