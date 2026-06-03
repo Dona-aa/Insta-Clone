@@ -1,27 +1,34 @@
-import pool from '$lib/server/db';
-import bcrypt from 'bcrypt';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import pool from '$lib/server/database.js';
+import { error } from 'console';
+import { verifyPassword, createSession } from '$lib/server/auth';
 
 export const actions = {
-    default: async ({ request }) => {
+	login: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const username = form.get('username');
+		const password = form.get('password');
 
-        const data = await request.formData();
+		if (!username || !password) {
+			return fail(400, { error: 'Bitte alle Felder ausfullen' });
+		}
 
-        const username = data.get('name');
-        const email = data.get('email');
-        const password = data.get('password');
+		//find user in database
+		const [rows] = await pool.execute('SELECT * from users where username = ?', [username]);
+		if (rows.length === 0) {
+			return fail(400, { error: 'Username not found' });
+		}
 
-        const password_hash = await bcrypt.hash(password, 10);
+		//check if password is correct
+		if (!(await verifyPassword(password, rows[0].password_hash))) {
+			return fail(400, { error: 'Password is not correct' });
+		}
 
-        await pool.query(
-            `
-            INSERT INTO users
-            (username, email, password_hash)
-            VALUES (?, ?, ?)
-            `,
-            [username, email, password_hash]
-        );
+		//create session and session cookie
+		const sessionId = await createSession(rows[0].id);
+		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
 
-        throw redirect(303, '/login');
-    }
+		// redirect
+		redirect(303, '/admin/events');
+	}
 };
