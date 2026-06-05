@@ -1,10 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import pool from '$lib/server/database.js';
-import { error } from 'console';
-import { verifyPassword, createSession } from '$lib/server/auth';
+import { request } from 'http';
+import { hashPassword, createSession } from '$lib/server/auth';
 
 export const actions = {
-	login: async ({ request, cookies }) => {
+	register: async ({ request, cookies }) => {
 		const form = await request.formData();
 		const username = form.get('username');
 		const password = form.get('password');
@@ -13,19 +13,19 @@ export const actions = {
 			return fail(400, { error: 'Bitte alle Felder ausfullen' });
 		}
 
-		//find user in database
-		const [rows] = await pool.execute('SELECT * from users where username = ?', [username]);
-		if (rows.length === 0) {
-			return fail(400, { error: 'Username not found' });
+		let result;
+		try {
+			[result] = await pool.execute('INSERT into users (username, password_hash) values (?,?)', [
+				username,
+				await hashPassword(password)
+			]);
+		} catch (err) {
+			if (err.code === 'ER_DUP_ENTRY') {
+				return fail(400, { error: 'Username is already taken!' });
+			}
 		}
-
-		//check if password is correct
-		if (!(await verifyPassword(password, rows[0].password_hash))) {
-			return fail(400, { error: 'Password is not correct' });
-		}
-
-		//create session and session cookie
-		const sessionId = await createSession(rows[0].id);
+		// create session
+		const sessionId = await createSession(result.insertId);
 		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
 
 		// redirect
