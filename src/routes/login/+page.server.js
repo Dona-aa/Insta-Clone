@@ -1,38 +1,34 @@
-import { db } from '$lib/server/db';
-import bcrypt from 'bcrypt';
-import { redirect, fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import pool from '$lib/server/database.js';
+import { error } from 'console';
+import { verifyPassword, createSession } from '$lib/server/auth';
 
 export const actions = {
-  default: async ({ request, cookies }) => {
-    const data = await request.formData();
+	login: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const username = form.get('username');
+		const password = form.get('password');
 
-    const email = data.get('email');
-    const password = data.get('password');
+		if (!username || !password) {
+			return fail(400, { error: 'Bitte alle Felder ausfullen' });
+		}
 
-    const [users] = await db.query(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
+		//find user in database
+		const [rows] = await pool.execute('SELECT * from users where username = ?', [username]);
+		if (rows.length === 0) {
+			return fail(400, { error: 'Username not found' });
+		}
 
-    const user = users[0];
+		//check if password is correct
+		if (!(await verifyPassword(password, rows[0].password_hash))) {
+			return fail(400, { error: 'Password is not correct' });
+		}
 
-    if (!user) {
-      return fail(400, { error: 'Wrong email or password.' });
-    }
+		//create session and session cookie
+		const sessionId = await createSession(rows[0].id);
+		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
 
-    const passwordIsCorrect = await bcrypt.compare(password, user.password);
-
-    if (!passwordIsCorrect) {
-      return fail(400, { error: 'Wrong email or password.' });
-    }
-
-    cookies.set('user_id', user.id, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7
-    });
-
-    throw redirect(303, '/');
-  }
+		// redirect
+		redirect(303, '/admin/events');
+	}
 };
