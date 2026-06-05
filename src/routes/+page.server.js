@@ -1,4 +1,4 @@
-import pool from '$lib/server/database.js';
+import pool from '$lib/server/db.js';
 
 export async function load() {
 	const [images] = await pool.execute(

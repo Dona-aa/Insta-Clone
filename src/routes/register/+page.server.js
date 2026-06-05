@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import pool from '$lib/server/database.js';
+import pool from '$lib/server/db.js';
 import { request } from 'http';
 import { hashPassword, createSession } from '$lib/server/auth';
 
