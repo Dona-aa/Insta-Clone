@@ -28,6 +28,14 @@
 			<p class="success">Your vote was saved.</p>
 		{/if}
 
+		{#if form?.deleteError}
+			<p class="alert small-alert">{form.deleteError}</p>
+		{/if}
+
+		{#if form?.deleteSuccess}
+			<p class="success">Comment was deleted.</p>
+		{/if}
+
 		<section class="comments">
 			<h2>Comments</h2>
 
@@ -45,7 +53,17 @@
 			<div class="comment-list">
 				{#each data.comments as comment (comment.id)}
 					<article class="comment">
-						<a href="/profile/{comment.user_id}">@{comment.username}</a>
+						<div class="comment-top">
+							<a href="/profile/{comment.user_id}">@{comment.username}</a>
+
+							{#if data.canDeleteComments}
+								<form action="?/deleteComment" method="POST">
+									<input type="hidden" name="commentId" value={comment.id} />
+									<button class="comment-delete" type="submit">Delete</button>
+								</form>
+							{/if}
+						</div>
+
 						<p>{comment.text}</p>
 					</article>
 				{:else}

@@ -531,6 +531,24 @@ textarea:focus {
 	margin: 0;
 	color: var(--ink);
 }
+.comment-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.comment-delete {
+	border: 0;
+	background: transparent;
+	color: #923a23;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.comment-delete:hover {
+	color: var(--accent);
+}
 
 @media (max-width: 800px) {
 	.nav {

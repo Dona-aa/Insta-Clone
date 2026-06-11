@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import pool from '$lib/server/db.js';
 
-export async function load({ params }) {
+export async function load({ params, locals }) {
 	const [images] = await pool.execute(
 		`SELECT i.id, i.image, i.description, i.votes, i.created_at,
 		        u.id AS author_id, u.username
@@ -26,7 +26,9 @@ export async function load({ params }) {
 		[params.id]
 	);
 
-	return { image, comments };
+	const canDeleteComments = locals.user?.id === image.author_id;
+
+	return { image, comments, canDeleteComments };
 }
 
 export const actions = {
@@ -68,5 +70,29 @@ export const actions = {
 		await pool.execute('UPDATE images SET votes = votes + 1 WHERE id = ?', [params.id]);
 
 		return { voteSuccess: true };
+	},
+
+	deleteComment: async ({ request, params, locals }) => {
+		if (!locals.user) {
+			redirect(303, '/login');
+		}
+
+		const formData = await request.formData();
+		const commentId = formData.get('commentId');
+
+		const [images] = await pool.execute('SELECT author_id FROM images WHERE id = ?', [params.id]);
+		const image = images[0];
+
+		if (!image) {
+			error(404, 'Image not found.');
+		}
+
+		if (image.author_id !== locals.user.id) {
+			return fail(403, { deleteError: 'You can only delete comments on your own post.' });
+		}
+
+		await pool.execute('DELETE FROM comments WHERE id = ? AND image_id = ?', [commentId, params.id]);
+
+		return { deleteSuccess: true };
 	}
 };
