@@ -29,6 +29,6 @@ export const actions = {
 		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
 
 		// redirect
-		redirect(303, '/admin/events');
+		redirect(303, '/');
 	}
 };
