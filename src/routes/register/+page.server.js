@@ -7,38 +7,51 @@ export const actions = {
 		const formData = await request.formData();
 
 		const username = String(formData.get('username') ?? '').trim();
+		const email = String(formData.get('email') ?? '').trim();
 		const password = String(formData.get('password') ?? '');
 
 		if (username.length < 3) {
 			return fail(400, {
 				error: 'Username must be at least 3 characters long.',
-				username
+				username,
+				email
+			});
+		}
+
+		if (!email.includes('@')) {
+			return fail(400, {
+				error: 'Please enter a valid email.',
+				username,
+				email
 			});
 		}
 
 		if (password.length < 6) {
 			return fail(400, {
 				error: 'Password must be at least 6 characters long.',
-				username
+				username,
+				email
 			});
 		}
 
-		const [existingUsers] = await pool.execute('SELECT id FROM users WHERE username = ?', [
-			username
-		]);
+		const [existingUsers] = await pool.execute(
+			'SELECT id FROM users WHERE username = ? OR email = ?',
+			[username, email]
+		);
 
 		if (existingUsers.length > 0) {
 			return fail(400, {
-				error: 'Username is already taken!',
-				username
+				error: 'Username or email is already taken!',
+				username,
+				email
 			});
 		}
 
 		const passwordHash = await hashPassword(password);
 
 		const [result] = await pool.execute(
-			'INSERT INTO users (username, password_hash) VALUES (?, ?)',
-			[username, passwordHash]
+			'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
+			[username, email, passwordHash]
 		);
 
 		const sessionId = await createSession(result.insertId);

@@ -2,35 +2,29 @@
 	let { form } = $props();
 </script>
 
-<h1>Register Page</h1>
-{#if form?.error}
-	<p id="warning" style="color: red">
-		{form.error}
-	</p>
-{/if}
-<section>
-	<form action="?/register" method="POST">
-		<div>
+<section class="auth-page">
+	<div class="form-card">
+		<p class="eyebrow">New account</p>
+		<h1>Join PixelPost</h1>
+		<p class="muted">Create an account to upload, comment and upvote pictures.</p>
+
+		{#if form?.error}
+			<p class="alert">{form.error}</p>
+		{/if}
+
+		<form class="stack-form" action="?/register" method="POST">
 			<label for="username">Username</label>
-			<input type="text" name="username" id="username" />
-		</div>
-		<div>
+			<input id="username" name="username" type="text" value={form?.username ?? ''} required />
+
+			<label for="email">Email</label>
+			<input id="email" name="email" type="email" value={form?.email ?? ''} required />
+
 			<label for="password">Password</label>
-			<input type="password" name="password" id="password" />
-		</div>
-		<div>
-			<button type="submit">Register</button>
-		</div>
-	</form>
+			<input id="password" name="password" type="password" required />
 
-	<a href="/register">Register</a>
+			<button class="button" type="submit">Create account</button>
+		</form>
+
+		<p class="form-switch">Already registered? <a href="/login">Log in</a></p>
+	</div>
 </section>
-
-<style>
-	#warning {
-		border: 1px solid red;
-		background-color: #ffaea8;
-		padding: 25px;
-		margin: 10px;
-	}
-</style>
