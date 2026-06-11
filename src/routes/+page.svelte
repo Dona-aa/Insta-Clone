@@ -22,7 +22,7 @@
 	</div>
 
 	<a
-		class="rounded-full bg-[#c95b39] px-5 py-3 font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
+		class="rounded-full bg-[#c95b39] px-10 py-5 text-[1.75rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a64326] hover:text-white"
 		href="/private/upload"
 	>
 		Share a picture
@@ -38,6 +38,7 @@
 				<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
 					Top pictures
 				</h2>
+
 				<p class="m-0 text-[#706c67]">Most loved by the community</p>
 			</div>
 		</div>
@@ -45,7 +46,7 @@
 		<div class="grid grid-cols-3 gap-[22px] max-[800px]:grid-cols-1">
 			{#each data.topImages as image, index (image.id)}
 				<a
-					class="relative overflow-hidden rounded-[18px] border border-[#e9e2d9] bg-white transition hover:-translate-y-1 hover:text-inherit hover:shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
+					class="relative overflow-hidden rounded-[18px] border border-[#e9e2d9] bg-white text-[#171615] transition hover:-translate-y-1 hover:text-[#171615] hover:shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
 					href="/image/{image.id}"
 				>
 					<span
@@ -78,6 +79,7 @@
 			<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
 				Latest posts
 			</h2>
+
 			<p class="m-0 text-[#706c67]">The newest images from all users</p>
 		</div>
 	</div>
@@ -92,7 +94,7 @@
 		<div class="grid grid-cols-3 gap-[22px] max-[800px]:grid-cols-1">
 			{#each data.images as image (image.id)}
 				<article
-					class="overflow-hidden rounded-[18px] border border-[#e9e2d9] bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
+					class="overflow-hidden rounded-[18px] border border-[#e9e2d9] bg-white text-[#171615] transition hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
 				>
 					<a href="/image/{image.id}">
 						<img
@@ -103,13 +105,19 @@
 					</a>
 
 					<div class="p-4">
-						<a class="font-bold hover:text-[#c95b39]" href="/profile/{image.author_id}">
+						<a
+							class="font-bold text-[#171615] hover:text-[#c95b39]"
+							href="/profile/{image.author_id}"
+						>
 							@{image.username}
 						</a>
 
 						<p class="my-2.5 leading-[1.45] text-[#171615]">{image.description}</p>
 
-						<a class="text-sm font-bold text-[#c95b39] hover:text-[#a64326]" href="/image/{image.id}">
+						<a
+							class="text-sm font-bold text-[#c95b39] hover:text-[#a64326]"
+							href="/image/{image.id}"
+						>
 							♥ {image.votes} votes
 						</a>
 					</div>
