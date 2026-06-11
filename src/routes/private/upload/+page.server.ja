@@ -1,0 +1,50 @@
+import { put } from '@vercel/blob';
+import { BLOB_READ_WRITE_TOKEN } from '$env/static/private';
+import { fail, redirect } from '@sveltejs/kit';
+import { randomUUID } from 'crypto';
+import pool from '$lib/server/database.js';
+
+export function load({ locals }) {
+	if (!locals.user) {
+		redirect(303, '/login');
+	}
+}
+
+export const actions = {
+	upload: async ({ request, locals }) => {
+		if (!locals.user) {
+			redirect(303, '/login');
+		}
+
+		const formData = await request.formData();
+		const description = String(formData.get('description') ?? '').trim();
+		const image = formData.get('image');
+
+		if (description.length < 3 || description.length > 200) {
+			return fail(400, { error: 'Description must have 3 to 200 characters.', description });
+		}
+
+		if (!(image instanceof File) || image.size === 0) {
+			return fail(400, { error: 'Please select an image.', description });
+		}
+
+		if (!image.type.startsWith('image/')) {
+			return fail(400, { error: 'Only image files are allowed.', description });
+		}
+
+		const filename = `${randomUUID()}-${image.name}`;
+
+		const blob = await put(filename, image, {
+			access: 'public',
+			token: BLOB_READ_WRITE_TOKEN
+		});
+
+		await pool.execute('INSERT INTO images (image, description, author_id) VALUES (?, ?, ?)', [
+			blob.url,
+			description,
+			locals.user.id
+		]);
+
+		redirect(303, `/profile/${locals.user.id}`);
+	}
+};
