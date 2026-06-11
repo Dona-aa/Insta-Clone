@@ -22,7 +22,7 @@
 	</div>
 
 	<a
-		class="rounded-full bg-[#c95b39] px-10 py-5 text-[1.75rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a64326] hover:text-white"
+		class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326] hover:!text-white"
 		href="/private/upload"
 	>
 		Share a picture
@@ -34,13 +34,11 @@
 		<div
 			class="mb-6 flex items-center justify-between gap-5 max-[800px]:flex-col max-[800px]:items-start"
 		>
-			<div>
-				<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
-					Top pictures
-				</h2>
+			<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
+				Top pictures
+			</h2>
 
-				<p class="m-0 text-[#706c67]">Most loved by the community</p>
-			</div>
+			<p class="m-0 text-[#706c67]">Most loved by the community</p>
 		</div>
 
 		<div class="grid grid-cols-3 gap-[22px] max-[800px]:grid-cols-1">
@@ -50,7 +48,7 @@
 					href="/image/{image.id}"
 				>
 					<span
-						class="absolute left-3 top-3 z-10 rounded-full bg-white px-2.5 py-1.5 font-bold"
+						class="absolute left-3 top-3 z-10 rounded-full bg-white px-2.5 py-1.5 font-bold text-[#171615]"
 					>
 						#{index + 1}
 					</span>
@@ -61,7 +59,7 @@
 						alt={image.description}
 					/>
 
-					<div class="flex justify-between p-3.5">
+					<div class="flex items-center justify-between p-3.5 text-[#171615]">
 						<span>@{image.username}</span>
 						<strong>♥ {image.votes}</strong>
 					</div>
@@ -75,13 +73,11 @@
 	<div
 		class="mb-6 flex items-center justify-between gap-5 max-[800px]:flex-col max-[800px]:items-start"
 	>
-		<div>
-			<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
-				Latest posts
-			</h2>
+		<h2 class="m-0 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
+			Latest posts
+		</h2>
 
-			<p class="m-0 text-[#706c67]">The newest images from all users</p>
-		</div>
+		<p class="m-0 text-[#706c67]">The newest images from all users</p>
 	</div>
 
 	{#if data.images.length === 0}
