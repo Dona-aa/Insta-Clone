@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import pool from '$lib/server/db.js';
 import { request } from 'http';
-import { hashPassword, createSession } from '$lib/server/auth';
+import { hashPassword, createSession } from '$lib/server/auth.js';
 
 export const actions = {
 	register: async ({ request, cookies }) => {
@@ -29,6 +29,6 @@ export const actions = {
 		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
 
 		// redirect
-		redirect(303, '/admin/events');
+		redirect(303, '/');
 	}
 };

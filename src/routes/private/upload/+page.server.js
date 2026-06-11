@@ -2,7 +2,7 @@ import { put } from '@vercel/blob';
 import { BLOB_READ_WRITE_TOKEN } from '$env/static/private';
 import { fail, redirect } from '@sveltejs/kit';
 import { randomUUID } from 'crypto';
-import pool from '$lib/server/database.js';
+import pool from '$lib/server/db.js';
 
 export function load({ locals }) {
 	if (!locals.user) {

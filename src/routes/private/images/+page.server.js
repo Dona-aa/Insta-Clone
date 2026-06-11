@@ -1,7 +1,7 @@
 import { del } from '@vercel/blob';
 import { BLOB_READ_WRITE_TOKEN } from '$env/static/private';
 import { fail, redirect } from '@sveltejs/kit';
-import pool from '$lib/server/database.js';
+import pool from '$lib/server/db.js';
 
 export async function load({ locals }) {
 	if (!locals.user) {

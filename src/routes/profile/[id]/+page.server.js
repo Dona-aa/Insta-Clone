@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import pool from '$lib/server/database.js';
+import pool from '$lib/server/db.js';
 
 export async function load({ params }) {
 	const [users] = await pool.execute('SELECT id, username FROM users WHERE id = ?', [params.id]);
