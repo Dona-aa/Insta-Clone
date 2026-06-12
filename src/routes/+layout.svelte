@@ -23,7 +23,7 @@
 				<a class="hover:text-[#c95b39]" href="/profile/{data.user.id}">My Profile</a>
 
 				<a
-					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
+					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
 					href="/private/upload"
 				>
 					Upload
@@ -40,7 +40,7 @@
 				<a class="hover:text-[#c95b39]" href="/login">Login</a>
 
 				<a
-					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
+					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
 					href="/register"
 				>
 					Register
