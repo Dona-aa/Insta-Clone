@@ -26,7 +26,7 @@ export async function load({ params, locals }) {
 		[params.id]
 	);
 
-	const canDeleteComments = locals.user?.id === image.author_id;
+const canDeleteComments = locals.user?.id === image.author_id || locals.user?.role === 'admin';
 
 	return { image, comments, canDeleteComments };
 }
@@ -87,9 +87,9 @@ export const actions = {
 			error(404, 'Image not found.');
 		}
 
-		if (image.author_id !== locals.user.id) {
+		if (image.author_id !== locals.user.id && locals.user.role !== 'admin') {
 			return fail(403, { deleteError: 'You can only delete comments on your own post.' });
-		}
+	}
 
 		await pool.execute('DELETE FROM comments WHERE id = ? AND image_id = ?', [commentId, params.id]);
 

@@ -25,22 +25,12 @@ export async function load({ locals }) {
 		 ORDER BY i.created_at DESC`
 	);
 
-	const [comments] = await pool.execute(
-		`SELECT c.id, c.text, c.created_at, u.username, i.id AS image_id
-		 FROM comments c
-		 JOIN users u ON u.id = c.user_id
-		 JOIN images i ON i.id = c.image_id
-		 ORDER BY c.created_at DESC`
-	);
-
 	return {
 		users,
 		images,
-		comments,
 		stats: {
 			userCount: users.length,
-			imageCount: images.length,
-			commentCount: comments.length
+			imageCount: images.length
 		}
 	};
 }
@@ -82,6 +72,63 @@ export const actions = {
 		};
 	},
 
+	deleteUser: async ({ request, locals }) => {
+		if (!locals.user || locals.user.role !== 'admin') {
+			redirect(303, '/');
+		}
+
+		const formData = await request.formData();
+		const userId = Number(formData.get('userId'));
+
+		if (userId === locals.user.id) {
+			return fail(400, {
+				error: 'You cannot delete yourself.'
+			});
+		}
+
+		const [users] = await pool.execute('SELECT id FROM users WHERE id = ? AND role != "admin"', [
+			userId
+		]);
+
+		if (users.length === 0) {
+			return fail(404, {
+				error: 'User was not found or cannot be deleted.'
+			});
+		}
+
+		const [userImages] = await pool.execute('SELECT id, image FROM images WHERE author_id = ?', [
+			userId
+		]);
+
+		for (const image of userImages) {
+			await del(image.image, {
+				token: BLOB_READ_WRITE_TOKEN
+			});
+		}
+
+		await pool.execute(
+			`DELETE FROM comments
+			 WHERE user_id = ?
+			 OR image_id IN (SELECT id FROM images WHERE author_id = ?)`,
+			[userId, userId]
+		);
+
+		await pool.execute(
+			`DELETE FROM votes
+			 WHERE user_id = ?
+			 OR image_id IN (SELECT id FROM images WHERE author_id = ?)`,
+			[userId, userId]
+		);
+
+		await pool.execute('DELETE FROM images WHERE author_id = ?', [userId]);
+		await pool.execute('DELETE FROM sessions WHERE user_id = ?', [userId]);
+		await pool.execute('DELETE FROM users WHERE id = ?', [userId]);
+
+		return {
+			success: 'User was fully deleted.'
+		};
+	},
+
 	deleteImage: async ({ request, locals }) => {
 		if (!locals.user || locals.user.role !== 'admin') {
 			redirect(303, '/');
@@ -103,25 +150,12 @@ export const actions = {
 			token: BLOB_READ_WRITE_TOKEN
 		});
 
+		await pool.execute('DELETE FROM comments WHERE image_id = ?', [imageId]);
+		await pool.execute('DELETE FROM votes WHERE image_id = ?', [imageId]);
 		await pool.execute('DELETE FROM images WHERE id = ?', [imageId]);
 
 		return {
 			success: 'Post was deleted.'
-		};
-	},
-
-	deleteComment: async ({ request, locals }) => {
-		if (!locals.user || locals.user.role !== 'admin') {
-			redirect(303, '/');
-		}
-
-		const formData = await request.formData();
-		const commentId = Number(formData.get('commentId'));
-
-		await pool.execute('DELETE FROM comments WHERE id = ?', [commentId]);
-
-		return {
-			success: 'Comment was deleted.'
 		};
 	}
 };

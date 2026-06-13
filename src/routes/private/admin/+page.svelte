@@ -1,5 +1,9 @@
 <script>
 	let { data, form } = $props();
+
+	function formatDate(date) {
+		return new Date(date).toLocaleString();
+	}
 </script>
 
 <section>
@@ -18,7 +22,7 @@
 			</h1>
 
 			<p class="m-0 text-[#706c67]">
-				Ban users, remove posts and moderate comments.
+				Ban users, delete users and remove posts.
 			</p>
 		</div>
 	</div>
@@ -35,22 +39,25 @@
 		</p>
 	{/if}
 
-	<div class="mb-10 grid grid-cols-3 gap-5 max-[800px]:grid-cols-1">
+	<div class="mb-10 grid grid-cols-2 gap-5 max-[800px]:grid-cols-1">
 		<div class="rounded-[18px] border border-[#e9e2d9] bg-white p-5">
-			<p class="m-0 text-sm font-bold uppercase tracking-[0.12em] text-[#c95b39]">Users</p>
-			<strong class="mt-3 block font-serif text-4xl text-[#171615]">{data.stats.userCount}</strong>
-		</div>
+			<p class="m-0 text-sm font-bold uppercase tracking-[0.12em] text-[#c95b39]">
+				Users
+			</p>
 
-		<div class="rounded-[18px] border border-[#e9e2d9] bg-white p-5">
-			<p class="m-0 text-sm font-bold uppercase tracking-[0.12em] text-[#c95b39]">Posts</p>
-			<strong class="mt-3 block font-serif text-4xl text-[#171615]">{data.stats.imageCount}</strong>
+			<strong class="mt-3 block font-serif text-4xl text-[#171615]">
+				{data.stats.userCount}
+			</strong>
 		</div>
 
 		<div class="rounded-[18px] border border-[#e9e2d9] bg-white p-5">
 			<p class="m-0 text-sm font-bold uppercase tracking-[0.12em] text-[#c95b39]">
-				Comments
+				Posts
 			</p>
-			<strong class="mt-3 block font-serif text-4xl text-[#171615]">{data.stats.commentCount}</strong>
+
+			<strong class="mt-3 block font-serif text-4xl text-[#171615]">
+				{data.stats.imageCount}
+			</strong>
 		</div>
 	</div>
 
@@ -68,34 +75,33 @@
 						<p class="m-0 font-bold text-[#171615]">@{user.username}</p>
 						<p class="m-0 text-sm text-[#706c67]">{user.email}</p>
 
-						<div class="mt-2 flex gap-2">
-							<span
-								class="rounded-full bg-[#f2ede7] px-3 py-1 text-xs font-bold text-[#171615]"
-							>
+						<p class="mt-1 text-sm text-[#706c67]">
+							Created: {formatDate(user.created_at)}
+						</p>
+
+						<div class="mt-2 flex flex-wrap gap-2">
+							<span class="rounded-full bg-[#f2ede7] px-3 py-1 text-xs font-bold text-[#171615]">
 								{user.role}
 							</span>
 
 							{#if user.is_banned === 1}
-								<span
-									class="rounded-full bg-[#fff0eb] px-3 py-1 text-xs font-bold text-[#923a23]"
-								>
+								<span class="rounded-full bg-[#fff0eb] px-3 py-1 text-xs font-bold text-[#923a23]">
 									banned
 								</span>
 							{:else}
-								<span
-									class="rounded-full bg-[#eaf6ee] px-3 py-1 text-xs font-bold text-[#24683e]"
-								>
+								<span class="rounded-full bg-[#eaf6ee] px-3 py-1 text-xs font-bold text-[#24683e]">
 									active
 								</span>
 							{/if}
 						</div>
 					</div>
 
-					<div>
+					<div class="flex flex-wrap justify-end gap-2 max-[800px]:justify-start">
 						{#if user.role !== 'admin'}
 							{#if user.is_banned === 1}
 								<form action="?/unbanUser" method="POST">
 									<input type="hidden" name="userId" value={user.id} />
+
 									<button
 										class="cursor-pointer rounded-full border border-[#cce8d5] bg-[#eaf6ee] px-4 py-2.5 font-bold text-[#24683e] hover:bg-[#dff1e5]"
 										type="submit"
@@ -106,6 +112,7 @@
 							{:else}
 								<form action="?/banUser" method="POST">
 									<input type="hidden" name="userId" value={user.id} />
+
 									<button
 										class="cursor-pointer rounded-full border border-[#e5b9ad] bg-[#fff4f0] px-4 py-2.5 font-bold text-[#923a23] hover:bg-[#ffe5dc]"
 										type="submit"
@@ -114,46 +121,18 @@
 									</button>
 								</form>
 							{/if}
+
+							<form action="?/deleteUser" method="POST">
+								<input type="hidden" name="userId" value={user.id} />
+
+								<button
+									class="cursor-pointer rounded-full border border-[#d9a0a0] bg-[#fff0f0] px-4 py-2.5 font-bold text-[#8b1d1d] hover:bg-[#ffe1e1]"
+									type="submit"
+								>
+									Delete user
+								</button>
+							</form>
 						{/if}
-					</div>
-				</article>
-			{/each}
-		</div>
-	</section>
-
-	<section class="mb-12">
-		<h2 class="mb-5 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
-			Posts
-		</h2>
-
-		<div class="grid grid-cols-3 gap-[22px] max-[800px]:grid-cols-1">
-			{#each data.images as image (image.id)}
-				<article
-					class="overflow-hidden rounded-[18px] border border-[#e9e2d9] bg-white text-[#171615]"
-				>
-					<a href="/image/{image.id}">
-						<img
-							class="aspect-square w-full object-cover"
-							src={image.image}
-							alt={image.description}
-						/>
-					</a>
-
-					<div class="p-4">
-						<p class="m-0 font-bold">@{image.username}</p>
-						<p class="my-2.5 leading-[1.45]">{image.description}</p>
-						<p class="m-0 text-sm font-bold text-[#c95b39]">♥ {image.votes} votes</p>
-
-						<form class="mt-4" action="?/deleteImage" method="POST">
-							<input type="hidden" name="imageId" value={image.id} />
-
-							<button
-								class="cursor-pointer rounded-full border border-[#e5b9ad] bg-[#fff4f0] px-4 py-2.5 font-bold text-[#923a23] hover:bg-[#ffe5dc]"
-								type="submit"
-							>
-								Delete post
-							</button>
-						</form>
 					</div>
 				</article>
 			{/each}
@@ -162,41 +141,67 @@
 
 	<section>
 		<h2 class="mb-5 font-serif text-[1.8rem] tracking-[-0.05rem] text-[#171615]">
-			Comments
+			All posts
 		</h2>
 
-		<div class="flex flex-col gap-3.5">
-			{#each data.comments as comment (comment.id)}
-				<article class="rounded-[13px] border border-[#e9e2d9] bg-white p-4">
-					<div class="flex items-start justify-between gap-4 max-[800px]:flex-col">
-						<div>
+		<p class="mb-5 text-[#706c67]">
+			Open a post to view its details and delete comments there.
+		</p>
+
+		<div class="grid grid-cols-4 gap-4 max-[1000px]:grid-cols-3 max-[800px]:grid-cols-1">
+			{#each data.images as image (image.id)}
+				<article
+					class="overflow-hidden rounded-[16px] border border-[#e9e2d9] bg-white text-[#171615]"
+				>
+					<a href="/image/{image.id}">
+						<img
+							class="h-[155px] w-full object-cover"
+							src={image.image}
+							alt={image.description}
+						/>
+					</a>
+
+					<div class="p-3">
+						<p class="m-0 text-sm font-bold">@{image.username}</p>
+
+						<p class="my-2 line-clamp-2 text-sm leading-[1.35]">
+							{image.description}
+						</p>
+
+						<p class="mb-2 mt-0 text-xs text-[#706c67]">
+							Created: {formatDate(image.created_at)}
+						</p>
+
+						<p class="m-0 text-xs font-bold text-[#c95b39]">
+							♥ {image.votes} votes
+						</p>
+
+						<div class="mt-3 flex gap-2">
 							<a
-								class="font-bold text-[#171615] hover:text-[#c95b39]"
-								href="/image/{comment.image_id}"
+								class="flex-1 rounded-full bg-[#c95b39] px-3 py-2 text-center text-sm font-bold !text-white hover:bg-[#a64326] hover:!text-white"
+								href="/image/{image.id}"
 							>
-								@{comment.username}
+								Open
 							</a>
 
-							<p class="mb-0 mt-2 leading-[1.45] text-[#171615]">{comment.text}</p>
+							<form class="flex-1" action="?/deleteImage" method="POST">
+								<input type="hidden" name="imageId" value={image.id} />
+
+								<button
+									class="w-full cursor-pointer rounded-full border border-[#e5b9ad] bg-[#fff4f0] px-3 py-2 text-sm font-bold text-[#923a23] hover:bg-[#ffe5dc]"
+									type="submit"
+								>
+									Delete
+								</button>
+							</form>
 						</div>
-
-						<form action="?/deleteComment" method="POST">
-							<input type="hidden" name="commentId" value={comment.id} />
-
-							<button
-								class="cursor-pointer rounded-full border border-[#e5b9ad] bg-[#fff4f0] px-4 py-2.5 font-bold text-[#923a23] hover:bg-[#ffe5dc]"
-								type="submit"
-							>
-								Delete
-							</button>
-						</form>
 					</div>
 				</article>
 			{:else}
 				<div
 					class="rounded-[18px] border border-dashed border-[#e9e2d9] bg-white px-6 py-[42px] text-center text-[#706c67]"
 				>
-					There are no comments yet.
+					There are no posts yet.
 				</div>
 			{/each}
 		</div>
