@@ -1,33 +1,53 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import pool from '$lib/server/db.js';
-import { verifyPassword, createSession } from '$lib/server/auth';
+import { createSession, verifyPassword } from '$lib/server/auth.js';
 
 export const actions = {
 	login: async ({ request, cookies }) => {
-		const form = await request.formData();
-		const username = form.get('username');
-		const password = form.get('password');
+		const formData = await request.formData();
+
+		const username = String(formData.get('username') ?? '').trim();
+		const password = String(formData.get('password') ?? '');
 
 		if (!username || !password) {
-			return fail(400, { error: 'Bitte alle Felder ausfullen' });
+			return fail(400, {
+				error: 'Please fill out all fields.',
+				username
+			});
 		}
 
-		//find user in database
-		const [rows] = await pool.execute('SELECT * from users where username = ?', [username]);
-		if (rows.length === 0) {
-			return fail(400, { error: 'Username not found' });
+		const [users] = await pool.execute(
+			'SELECT id, username, password_hash, is_banned FROM users WHERE username = ?',
+			[username]
+		);
+
+		const user = users[0];
+
+		if (!user || !(await verifyPassword(password, user.password_hash))) {
+			return fail(400, {
+				error: 'Username or password is incorrect.',
+				username
+			});
 		}
 
-		//check if password is correct
-		if (!(await verifyPassword(password, rows[0].password_hash))) {
-			return fail(400, { error: 'Password is not correct' });
+		if (user.is_banned === 1) {
+			return fail(403, {
+				error: 'This account has been banned.',
+				username
+			});
 		}
 
-		//create session and session cookie
-		const sessionId = await createSession(rows[0].id);
-		cookies.set('session_id', sessionId, { path: '/', maxAge: 60 * 60 * 24 * 30 });
+		const sessionId = await createSession(user.id);
 
-		// redirect
+		cookies.set('session_id', sessionId, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: !dev,
+			maxAge: 60 * 60 * 24 * 30
+		});
+
 		redirect(303, '/');
 	}
 };
