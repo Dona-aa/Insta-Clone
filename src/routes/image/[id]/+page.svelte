@@ -1,5 +1,15 @@
 <script>
 	let { data, form } = $props();
+
+	function formatDate(date) {
+		return new Date(date).toLocaleString('en-GB', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+	}
 </script>
 
 <section class="grid grid-cols-[minmax(360px,1.05fr)_minmax(300px,0.8fr)] gap-[38px] max-[800px]:grid-cols-1">
@@ -12,12 +22,18 @@
 	</div>
 
 	<div class="pt-2.5">
-		<a
-			class="font-bold text-[#171615] hover:text-[#c95b39]"
-			href="/profile/{data.image.author_id}"
-		>
-			@{data.image.username}
-		</a>
+		<div class="mb-4">
+			<a
+				class="font-bold text-[#171615] hover:text-[#c95b39]"
+				href="/profile/{data.image.author_id}"
+			>
+				@{data.image.username}
+			</a>
+
+			<p class="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-[#9b9288]">
+				Posted {formatDate(data.image.created_at)}
+			</p>
+		</div>
 
 		<p class="my-[17px] mb-[26px] text-[1.12rem] leading-[1.55] text-[#171615]">
 			{data.image.description}
@@ -100,13 +116,19 @@
 			<div class="flex flex-col gap-[15px] pt-[22px]">
 				{#each data.comments as comment (comment.id)}
 					<article class="rounded-[13px] border border-[#e9e2d9] bg-white p-4">
-						<div class="flex items-center justify-between gap-3">
-							<a
-								class="font-bold text-[#171615] hover:text-[#c95b39]"
-								href="/profile/{comment.user_id}"
-							>
-								@{comment.username}
-							</a>
+						<div class="flex items-start justify-between gap-3">
+							<div>
+								<a
+									class="font-bold text-[#171615] hover:text-[#c95b39]"
+									href="/profile/{comment.user_id}"
+								>
+									@{comment.username}
+								</a>
+
+								<p class="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-[#9b9288]">
+									{formatDate(comment.created_at)}
+								</p>
+							</div>
 
 							{#if data.canDeleteComments}
 								<form action="?/deleteComment" method="POST">
