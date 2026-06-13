@@ -12,7 +12,7 @@ export async function verifyPassword(password, hash) {
 
 export async function createSession(userId) {
 	const sessionId = randomUUID();
-	const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+	const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
 	await pool.execute('INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)', [
 		sessionId,
@@ -25,7 +25,10 @@ export async function createSession(userId) {
 
 export async function validateSession(sessionId) {
 	const [rows] = await pool.execute(
-		'SELECT u.id, u.username FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.id = ? AND s.expires_at > NOW()',
+		`SELECT u.id, u.username, u.role, u.is_banned
+		 FROM sessions s
+		 JOIN users u ON s.user_id = u.id
+		 WHERE s.id = ? AND s.expires_at > NOW() AND u.is_banned = 0`,
 		[sessionId]
 	);
 
