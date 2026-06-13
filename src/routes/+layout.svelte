@@ -12,35 +12,51 @@
 	<nav
 		class="mx-auto flex min-h-[70px] w-[min(1120px,calc(100%-32px))] items-center justify-between gap-6 max-[800px]:flex-col max-[800px]:items-start max-[800px]:py-4"
 	>
-		<a class="font-serif text-[1.6rem] font-bold tracking-[-0.06rem] hover:text-[#c95b39]" href="/">
+		<a
+			class="font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615] hover:text-[#c95b39]"
+			href="/"
+		>
 			PixelPost
 		</a>
 
-		<div class="flex items-center gap-[22px] text-[0.95rem] max-[800px]:flex-wrap max-[800px]:gap-x-[18px] max-[800px]:gap-y-[13px]">
-			<a class="hover:text-[#c95b39]" href="/">Explore</a>
+		<div
+			class="flex items-center gap-[22px] text-[0.95rem] text-[#171615] max-[800px]:flex-wrap max-[800px]:gap-x-[18px] max-[800px]:gap-y-[13px]"
+		>
+			<a class="text-[#171615] hover:text-[#c95b39]" href="/">Explore</a>
 
 			{#if data.user}
-				<a class="hover:text-[#c95b39]" href="/profile/{data.user.id}">My Profile</a>
+				<a class="text-[#171615] hover:text-[#c95b39]" href="/profile/{data.user.id}">
+					My Profile
+				</a>
 
 				<a
-					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
+					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326] hover:!text-white"
 					href="/private/upload"
 				>
 					Upload
 				</a>
 
-				<a class="hover:text-[#c95b39]" href="/private/images">Manage</a>
+				<a class="text-[#171615] hover:text-[#c95b39]" href="/private/images">Manage</a>
+
+				{#if data.user.role === 'admin'}
+					<a class="font-bold text-[#c95b39] hover:text-[#a64326]" href="/private/admin">
+						Admin
+					</a>
+				{/if}
 
 				<form class="m-0" action="/logout?/logout" method="POST">
-					<button class="cursor-pointer border-0 bg-transparent font-inherit hover:text-[#c95b39]" type="submit">
+					<button
+						class="cursor-pointer border-0 bg-transparent text-[0.95rem] text-[#171615] hover:text-[#c95b39]"
+						type="submit"
+					>
 						Logout
 					</button>
 				</form>
 			{:else}
-				<a class="hover:text-[#c95b39]" href="/login">Login</a>
+				<a class="text-[#171615] hover:text-[#c95b39]" href="/login">Login</a>
 
 				<a
-					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326]"
+					class="rounded-full bg-[#c95b39] px-5 py-3 font-bold !text-white transition hover:-translate-y-0.5 hover:bg-[#a64326] hover:!text-white"
 					href="/register"
 				>
 					Register
@@ -61,6 +77,7 @@
 		<p class="m-0 font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615]">
 			PixelPost
 		</p>
+
 		<p>Share pictures. Discover moments.</p>
 	</div>
 </footer>
