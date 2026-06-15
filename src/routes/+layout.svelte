@@ -104,12 +104,18 @@
 
 <footer class="border-t border-[#e9e2d9] py-[30px]">
 	<div
-		class="mx-auto flex w-[min(1120px,calc(100%-32px))] items-center justify-between text-[#706c67] max-[800px]:flex-col max-[800px]:items-start"
+		class="mx-auto flex w-[min(1120px,calc(100%-32px))] items-center justify-between gap-4 text-sm text-[#706c67] max-[800px]:flex-col max-[800px]:items-start"
 	>
-		<p class="m-0 font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615]">
-			PixelPost
-		</p>
+		<div>
+			<p class="m-0 font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615]">
+				PixelPost
+			</p>
+			<p class="m-0 mt-1">Share pictures. Discover moments.</p>
+		</div>
 
-		<p>Share pictures. Discover moments.</p>
+		<div class="text-right max-[800px]:text-left">
+			<p class="m-0">© 2026 PixelPost. All rights reserved.</p>
+		
+		</div>
 	</div>
 </footer>
