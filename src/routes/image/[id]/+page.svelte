@@ -35,9 +35,57 @@
 			</p>
 		</div>
 
-		<p class="my-[17px] mb-[26px] text-[1.12rem] leading-[1.55] text-[#171615]">
-			{data.image.description}
-		</p>
+		<div class="mb-[26px]">
+			<div class="flex items-start justify-between gap-3">
+				<p class="my-[17px] text-[1.12rem] leading-[1.55] text-[#171615]">
+					{data.image.description}
+				</p>
+
+				{#if data.canEditPost}
+					<details class="group">
+						<summary
+							class="list-none rounded-full bg-[#f2ede7] px-3 py-1.5 text-sm font-bold text-[#c95b39] transition hover:bg-[#eadfd3] hover:text-[#a64326]"
+							title="Edit description"
+						>
+							✎
+						</summary>
+
+						<form
+							class="mt-3 w-[280px] rounded-[14px] border border-[#e9e2d9] bg-white p-3 shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
+							action="?/editDescription"
+							method="POST"
+						>
+							<textarea
+								class="w-full rounded-[11px] border border-[#e9e2d9] bg-[#fbf9f6] px-3.5 py-3 text-sm focus:border-[#c95b39] focus:outline-2 focus:outline-[#efc5b6]"
+								name="description"
+								rows="4"
+								maxlength="200"
+								required>{data.image.description}</textarea
+							>
+
+							<button
+								class="mt-2 w-full rounded-full bg-[#c95b39] px-4 py-2 text-sm font-bold !text-white hover:bg-[#a64326] hover:!text-white"
+								type="submit"
+							>
+								Save
+							</button>
+						</form>
+					</details>
+				{/if}
+			</div>
+
+			{#if form?.editError}
+				<p class="mt-3 rounded-[10px] bg-[#fff0eb] px-3.5 py-3 text-sm text-[#923a23]">
+					{form.editError}
+				</p>
+			{/if}
+
+			{#if form?.editSuccess}
+				<p class="mt-3 rounded-[10px] bg-[#eaf6ee] px-3.5 py-3 text-sm text-[#24683e]">
+					Description was updated.
+				</p>
+			{/if}
+		</div>
 
 		<div
 			class="flex items-center justify-between gap-5 border-y border-[#e9e2d9] py-[18px]"
@@ -74,7 +122,19 @@
 
 		{#if form?.deleteSuccess}
 			<p class="mt-4 rounded-[10px] bg-[#eaf6ee] px-3.5 py-3 text-sm text-[#24683e]">
-				Comment was deleted.
+				Comment was removed.
+			</p>
+		{/if}
+
+		{#if form?.commentEditError}
+			<p class="mt-4 rounded-[10px] bg-[#fff0eb] px-3.5 py-3 text-sm text-[#923a23]">
+				{form.commentEditError}
+			</p>
+		{/if}
+
+		{#if form?.commentEditSuccess}
+			<p class="mt-4 rounded-[10px] bg-[#eaf6ee] px-3.5 py-3 text-sm text-[#24683e]">
+				Comment was updated.
 			</p>
 		{/if}
 
@@ -130,18 +190,55 @@
 								</p>
 							</div>
 
-							{#if data.canDeleteComments}
-								<form action="?/deleteComment" method="POST">
-									<input type="hidden" name="commentId" value={comment.id} />
+							<div class="flex items-center gap-2">
+								{#if data.user?.id === comment.user_id}
+									<details class="group relative">
+										<summary
+											class="list-none rounded-full bg-[#f2ede7] px-2.5 py-1 text-sm font-bold text-[#c95b39] transition hover:bg-[#eadfd3] hover:text-[#a64326]"
+											title="Edit comment"
+										>
+											✎
+										</summary>
 
-									<button
-										class="cursor-pointer border-0 bg-transparent font-bold text-[#923a23] hover:text-[#c95b39]"
-										type="submit"
-									>
-										Delete
-									</button>
-								</form>
-							{/if}
+										<form
+											class="absolute right-0 z-10 mt-2 w-[280px] rounded-[14px] border border-[#e9e2d9] bg-white p-3 shadow-[0_14px_32px_rgba(30,20,10,0.08)]"
+											action="?/editComment"
+											method="POST"
+										>
+											<input type="hidden" name="commentId" value={comment.id} />
+
+											<textarea
+												class="w-full rounded-[11px] border border-[#e9e2d9] bg-[#fbf9f6] px-3.5 py-3 text-sm focus:border-[#c95b39] focus:outline-2 focus:outline-[#efc5b6]"
+												name="text"
+												rows="3"
+												maxlength="300"
+												required>{comment.text}</textarea
+											>
+
+											<button
+												class="mt-2 w-full rounded-full bg-[#c95b39] px-4 py-2 text-sm font-bold !text-white hover:bg-[#a64326] hover:!text-white"
+												type="submit"
+											>
+												Save
+											</button>
+										</form>
+									</details>
+								{/if}
+
+								{#if data.user?.id === comment.user_id || data.canModerateComments}
+									<form action="?/deleteComment" method="POST">
+										<input type="hidden" name="commentId" value={comment.id} />
+
+										<button
+											class="cursor-pointer rounded-full border-0 bg-[#fff4f0] px-2.5 py-1 text-sm font-bold text-[#923a23] transition hover:bg-[#ffe5dc] hover:text-[#c95b39]"
+											type="submit"
+											title="Remove comment"
+										>
+											🗑
+										</button>
+									</form>
+								{/if}
+							</div>
 						</div>
 
 						<p class="mb-0 mt-2 leading-[1.45] text-[#171615]">{comment.text}</p>
