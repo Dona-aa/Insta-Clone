@@ -26,7 +26,7 @@
 </script>
 
 <svelte:head>
-	<title>PixelPost</title>
+	<title>Click</title>
 </svelte:head>
 
 <header class="sticky top-0 z-20 border-b border-[#e9e2d9] bg-[#fbf9f6]/95 backdrop-blur-xl">
@@ -37,7 +37,7 @@
 			class="font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615] transition hover:text-[#c95b39]"
 			href="/"
 		>
-			PixelPost
+			Click.
 		</a>
 
 		<div
@@ -108,13 +108,13 @@
 	>
 		<div>
 			<p class="m-0 font-serif text-[1.6rem] font-bold tracking-[-0.06rem] text-[#171615]">
-				PixelPost
+				Click.
 			</p>
 			<p class="m-0 mt-1">Share pictures. Discover moments.</p>
 		</div>
 
 		<div class="text-right max-[800px]:text-left">
-			<p class="m-0">© 2026 PixelPost. All rights reserved.</p>
+			<p class="m-0">© 2026 Click. All rights reserved.</p>
 		
 		</div>
 	</div>
